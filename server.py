@@ -62,7 +62,7 @@ def acceptWrapper(sock):
     print('number of connected client: ', len(clients))
 
 
-def performService(key, mask):
+def performService(key):
 
     conn = key.fileobj
     data = key.data
@@ -109,7 +109,7 @@ def main():
             if key.data is None:
                 acceptWrapper(key.fileobj)
             else:
-                performService(key, mask)
+                performService(key)
 
 
 if __name__ == '__main__':
