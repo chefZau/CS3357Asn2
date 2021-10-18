@@ -66,13 +66,13 @@ def performService(key, mask):
     conn = key.fileobj
     data = key.data
 
-    recvData = conn.recv(BUFFER_SIZE).decode(FORMAT)
+    message = conn.recv(BUFFER_SIZE).decode(FORMAT)
 
-    if recvData:
+    if message:
 
-        conn.sendall(recvData.encode(FORMAT))
+        conn.sendall(message.encode(FORMAT))
 
-        print(f'message: {recvData}')
+        print(f'message: {message}')
 
     else:
         print(
