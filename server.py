@@ -26,6 +26,12 @@ def signalHandler(sig, frame):
     sys.exit(0)
 
 
+def broadcast(clientName, message):
+    for name, conn in clients.items():
+        formatedMessage = f'@{clientName}: {message}'
+        if name != clientName:
+            conn.send(formatedMessage)
+
 def acceptWrapper(sock):
 
     # accept connection
