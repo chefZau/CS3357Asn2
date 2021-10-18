@@ -11,14 +11,15 @@ DISCONNECT_MESSAGE = "!DISCONNECT"
 
 BUFFER_SIZE = 2048
 
-
+active = True
 def signalHandler(sig, frame):
+    active = False
     print('Interrupt received, shutting down ...')
     sys.exit(0)
 
 
 def main():
-
+    
     # Register our signal handler for shutting down.
     signal.signal(signal.SIGINT, signalHandler)
 
@@ -42,15 +43,16 @@ def main():
     msg = 'Connection to server established. Sending intro message...\nRegistration successful.  Ready for messageing!\n'
     print(msg)
 
-    for line in sys.stdin:
+    while active:
+
+        line = input('>')
 
         client.send(line.rstrip().encode(FORMAT))
 
         msg = client.recv(BUFFER_SIZE).decode(FORMAT)
-
         if msg:
-            print(f'Received: {msg}')
-
+            print(msg)
+    
     client.close()
 
 
