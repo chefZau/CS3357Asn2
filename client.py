@@ -12,6 +12,8 @@ DISCONNECT_MESSAGE = "!DISCONNECT"
 BUFFER_SIZE = 2048
 
 active = True
+
+
 def signalHandler(sig, frame):
     active = False
     print('Interrupt received, shutting down ...')
@@ -19,7 +21,7 @@ def signalHandler(sig, frame):
 
 
 def main():
-    
+
     # Register our signal handler for shutting down.
     signal.signal(signal.SIGINT, signalHandler)
 
@@ -52,7 +54,7 @@ def main():
         msg = client.recv(BUFFER_SIZE).decode(FORMAT)
         if msg:
             print(msg)
-    
+
     client.close()
 
 
