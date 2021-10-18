@@ -30,7 +30,7 @@ def broadcast(clientName, message):
     for name, conn in clients.items():
         formatedMessage = f'@{clientName}: {message}'
         if name != clientName:
-            conn.send(formatedMessage)
+            conn.sendall(formatedMessage.encode(FORMAT))
 
 def acceptWrapper(sock):
 
@@ -70,9 +70,8 @@ def performService(key, mask):
 
     if message:
 
-        conn.sendall(message.encode(FORMAT))
-
-        print(f'message: {message}')
+        print(f'Received message from user {data.name}: {message}')
+        broadcast(data.name, message)
 
     else:
         print(
