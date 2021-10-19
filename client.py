@@ -5,6 +5,8 @@ import argparse
 import signal
 from urllib.parse import urlparse
 import sys
+import fcntl
+import os
 
 FORMAT = 'utf-8'
 DISCONNECT_MESSAGE = "!DISCONNECT"
@@ -20,11 +22,13 @@ def signalHandler(sig, frame):
     sys.exit(0)
 
 
-def main():
+def setInputNonBlocking():
+    # set sys.stdin non-blocking
+    origFl = fcntl.fcntl(sys.stdin, fcntl.F_GETFL)
+    fcntl.fcntl(sys.stdin, fcntl.F_SETFL, origFl | os.O_NONBLOCK)
 
-    # Register our signal handler for shutting down.
-    signal.signal(signal.SIGINT, signalHandler)
 
+def getArgs():
     parser = argparse.ArgumentParser()
     parser.add_argument("name", help="Host name of server")
     parser.add_argument("address", help="Port number of server")
@@ -34,13 +38,25 @@ def main():
     address = args.address
 
     parsedURL = urlparse(address)
-    ADDR = (parsedURL.hostname, parsedURL.port)
+
+    return name, parsedURL.hostname, parsedURL.port
+
+
+def main():
+
+    # Register our signal handler for shutting down.
+    signal.signal(signal.SIGINT, signalHandler)
+
+    # setInputNonBlocking()
+
+    NAME, HOST, PORT = getArgs()
+    ADDR = (HOST, PORT)
 
     print('Connecting to server ...')
 
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client.connect(ADDR)
-    client.sendall(f'USERNAME:{name}'.encode(FORMAT))
+    client.sendall(f'USERNAME:{NAME}'.encode(FORMAT))
 
     msg = 'Connection to server established. Sending intro message...\nRegistration successful.  Ready for messageing!\n'
     print(msg)
