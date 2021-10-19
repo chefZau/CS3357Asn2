@@ -56,6 +56,7 @@ def main():
     print('Connecting to server ...')
 
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client.setblocking(False)
     client.connect(ADDR)
     client.sendall(f'USERNAME:{NAME}'.encode(FORMAT))
 
