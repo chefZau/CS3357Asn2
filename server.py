@@ -104,7 +104,7 @@ def main():
     while True:
 
         events = sel.select(timeout=None)
-        for key, mask in events:
+        for key, _ in events:
 
             if key.data is None:
                 acceptWrapper(key.fileobj)
