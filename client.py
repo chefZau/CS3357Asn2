@@ -17,6 +17,7 @@ active = True
 
 
 def signalHandler(sig, frame):
+    global active
     active = False
     print('Interrupt received, shutting down ...')
     sys.exit(0)
