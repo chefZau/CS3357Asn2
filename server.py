@@ -11,8 +11,6 @@ SERVER = socket.gethostbyname(socket.gethostname())  # get the IP by name
 ADDR = (SERVER, PORT)
 
 FORMAT = 'utf-8'
-DISCONNECT_MESSAGE = "!DISCONNECT"
-
 BUFFER_SIZE = 2048
 
 sel = selectors.DefaultSelector()
@@ -46,14 +44,12 @@ def acceptWrapper(sock):
 
     print(
         f'Connection to client estatblished, waiting to reveive messages from user "{username}" ... ')
- 
+
     # add client to the dicitonary
     clients[username] = conn
-
+    
     data = types.SimpleNamespace(
         addr=addr,
-        inb=b'',
-        outb=b'',
         name=username
     )
 
