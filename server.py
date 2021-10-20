@@ -76,7 +76,7 @@ def acceptWrapper(sock):
 
         sel.register(conn, selectors.EVENT_READ, data=data)
 
-        print('number of connected client: ', len(clients))
+        print('Number of connected client: ', len(clients))
 
 
 def performService(key):

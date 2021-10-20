@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 
-import socket
-import argparse
-import signal
 from urllib.parse import urlparse
-import sys
-import fcntl
-import os
 import selectors
+import argparse
+import socket
+import signal
+import fcntl
+import sys
+import os
 
 FORMAT = 'utf-8'
 BUFFER_SIZE = 2048
@@ -67,13 +67,13 @@ def read(sock):
             signIn = True
 
             sel.register(sys.stdin, selectors.EVENT_READ, getStdinInput)
-        
+
         elif msg in ['401 Client already registered', '400 Invalid registration']:
             print(f'\n{msg}')
             sel.unregister(sock)
             sock.close()
             sys.exit(0)
-            
+
         else:
             print()
             print(msg)
