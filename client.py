@@ -21,6 +21,7 @@ fcntl.fcntl(sys.stdin, fcntl.F_SETFL, origFl | os.O_NONBLOCK)
 
 signIn = False
 
+
 def signalHandler(sig, frame):
     """Executed when a user press control + c"""
     print('Interrupt received, shutting down ...')
@@ -58,19 +59,21 @@ def read(sock):
     if msg:
 
         if msg == '200 Registration successful':
-            
+
             msg = 'Connection to server established. Sending intro message...\nRegistration successful.  Ready for messageing!\n'
             print(msg)
-            
+
             global signIn
             signIn = True
-            
+
             sel.register(sys.stdin, selectors.EVENT_READ, getStdinInput)
+        
         elif msg in ['401 Client already registered', '400 Invalid registration']:
             print(f'\n{msg}')
             sel.unregister(sock)
             sock.close()
             sys.exit(0)
+            
         else:
             print()
             print(msg)
@@ -80,6 +83,7 @@ def read(sock):
         sel.unregister(sock)
         sock.close()
         sys.exit(0)
+
 
 def getStdinInput(stdin, conn):
     """Read user input from stdin, and send it to the server
@@ -108,7 +112,7 @@ def main():
     client.sendall(registrationMsg.encode(FORMAT))
 
     print('Connecting to server ...')
-    
+
     sel.register(client, selectors.EVENT_READ, read)
 
     while True:

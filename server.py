@@ -61,7 +61,7 @@ def acceptWrapper(sock):
         validRegistration = False
 
     conn.sendall(controlMsg.encode(FORMAT))
-    
+
     if validRegistration:
         print(
             f'Connection to client estatblished, waiting to reveive messages from user "{username}" ... ')
