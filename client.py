@@ -12,8 +12,10 @@ import selectors
 FORMAT = 'utf-8'
 BUFFER_SIZE = 2048
 
-# set input non blocking
+# create default selector for handling multiple IO
 sel = selectors.DefaultSelector()
+
+# set input non blocking
 origFl = fcntl.fcntl(sys.stdin, fcntl.F_GETFL)
 fcntl.fcntl(sys.stdin, fcntl.F_SETFL, origFl | os.O_NONBLOCK)
 
