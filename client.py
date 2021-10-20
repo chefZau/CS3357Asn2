@@ -51,7 +51,7 @@ def getArgs():
 
 def read(sock):
     """Retrieves server data and print it to console
-    
+
     Args:
         sock (socket): the current socket/connection
     """
@@ -87,6 +87,7 @@ def main():
     print('Connecting to server ...')
 
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    
     client.connect(ADDR)
 
     client.setblocking(False)

@@ -45,12 +45,12 @@ def acceptWrapper(sock):
     Args:
         sock (socket object): the socket
     """
-    
+
     # accept connection
     conn, addr = sock.accept()
 
     print(f'Accepted connection from client address: {addr}')
-    
+
     conn.setblocking(False)
 
     # retrieves the username from the client
