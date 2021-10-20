@@ -19,6 +19,7 @@ sel = selectors.DefaultSelector()
 origFl = fcntl.fcntl(sys.stdin, fcntl.F_GETFL)
 fcntl.fcntl(sys.stdin, fcntl.F_SETFL, origFl | os.O_NONBLOCK)
 
+signIn = False
 
 def signalHandler(sig, frame):
     """Executed when a user press control + c"""
@@ -55,14 +56,30 @@ def read(sock):
     """
     msg = sock.recv(BUFFER_SIZE).decode(FORMAT)
     if msg:
-        print()
-        print(msg)
+
+        if msg == '200 Registration successful':
+            
+            msg = 'Connection to server established. Sending intro message...\nRegistration successful.  Ready for messageing!\n'
+            print(msg)
+            
+            global signIn
+            signIn = True
+            
+            sel.register(sys.stdin, selectors.EVENT_READ, getStdinInput)
+        elif msg in ['401 Client already registered', '400 Invalid registration']:
+            print(f'\n{msg}')
+            sel.unregister(sock)
+            sock.close()
+            sys.exit(0)
+        else:
+            print()
+            print(msg)
+
     else:
         print('\nDisconnected from server ... exiting!')
         sel.unregister(sock)
         sock.close()
         sys.exit(0)
-
 
 def getStdinInput(stdin, conn):
     """Read user input from stdin, and send it to the server
@@ -83,35 +100,27 @@ def main():
     NAME, HOST, PORT = getArgs()
     ADDR = (HOST, PORT)
 
-    print('Connecting to server ...')
-
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client.connect(ADDR)
-
     client.setblocking(False)
 
-    client.sendall(f'USERNAME:{NAME}'.encode(FORMAT))
+    registrationMsg = f'REGISTER {NAME} CHAT/1.0'
+    client.sendall(registrationMsg.encode(FORMAT))
 
-    msg = 'Connection to server established. Sending intro message...\nRegistration successful.  Ready for messageing!\n'
-    print(msg)
-
+    print('Connecting to server ...')
+    
     sel.register(client, selectors.EVENT_READ, read)
-    sel.register(sys.stdin, selectors.EVENT_READ, getStdinInput)
 
-    try:
-        while True:
+    while True:
+        if signIn:
             sys.stdout.write('> ')
             sys.stdout.flush()
-            for k, _ in sel.select(timeout=None):
-                callback = k.data
-                if callback == getStdinInput:
-                    callback(k.fileobj, client)
-                else:
-                    callback(k.fileobj)
-    finally:
-        sel.unregister(sys.stdin)
-        client.close()
-        sel.close()
+        for k, _ in sel.select(timeout=None):
+            callback = k.data
+            if callback == getStdinInput:
+                callback(k.fileobj, client)
+            else:
+                callback(k.fileobj)
 
 
 if __name__ == '__main__':
