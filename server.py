@@ -18,6 +18,7 @@ sel = selectors.DefaultSelector()
 # clients: { client Name: client Connection }
 clients = dict()
 
+
 def broadcast(clientName, message):
     """Broadcasts the message to all clients except for the sender
 
@@ -48,22 +49,34 @@ def acceptWrapper(sock):
 
     # retrieves the username from the client
     msg = conn.recv(BUFFER_SIZE).decode(FORMAT)
-    username = msg.lstrip('USERNAME:')
+    username = msg.lstrip('REGISTER ').rstrip(' CHAT/1.0')
 
-    print(
-        f'Connection to client estatblished, waiting to reveive messages from user "{username}" ... ')
+    validRegistration = True
+    controlMsg = '200 Registration successful'
+    if 'REGISTER ' not in msg or ' CHAT/1.0' not in msg:
+        controlMsg = '400 Invalid registration'
+        validRegistration = False
+    elif username in clients:
+        controlMsg = '401 Client already registered'
+        validRegistration = False
 
-    # add client to the dicitonary
-    clients[username] = conn
+    conn.sendall(controlMsg.encode(FORMAT))
+    
+    if validRegistration:
+        print(
+            f'Connection to client estatblished, waiting to reveive messages from user "{username}" ... ')
 
-    data = types.SimpleNamespace(
-        addr=addr,
-        name=username
-    )
+        # add client to the dicitonary
+        clients[username] = conn
 
-    sel.register(conn, selectors.EVENT_READ, data=data)
+        data = types.SimpleNamespace(
+            addr=addr,
+            name=username
+        )
 
-    print('number of connected client: ', len(clients))
+        sel.register(conn, selectors.EVENT_READ, data=data)
+
+        print('number of connected client: ', len(clients))
 
 
 def performService(key):
@@ -104,7 +117,7 @@ def main():
     server.setblocking(False)
 
     sel.register(server, selectors.EVENT_READ)
-    
+
     def signalHandler(sig, frame):
         """Executed when a user press control + c"""
         print('Interrupt received, shutting down ...')
