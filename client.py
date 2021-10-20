@@ -58,6 +58,7 @@ def read(sock):
     try:
         msg = sock.recv(BUFFER_SIZE).decode(FORMAT)
         if msg:
+            print()
             print(msg)
     except:
         global active
