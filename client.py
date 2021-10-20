@@ -12,8 +12,6 @@ import selectors
 FORMAT = 'utf-8'
 BUFFER_SIZE = 2048
 
-active = True
-
 # set input non blocking
 sel = selectors.DefaultSelector()
 origFl = fcntl.fcntl(sys.stdin, fcntl.F_GETFL)
@@ -22,8 +20,6 @@ fcntl.fcntl(sys.stdin, fcntl.F_SETFL, origFl | os.O_NONBLOCK)
 
 def signalHandler(sig, frame):
     """Executed when a user press control + c"""
-    global active
-    active = False
     print('Interrupt received, shutting down ...')
     sys.exit(0)
 
@@ -55,14 +51,15 @@ def read(sock):
     Args:
         sock (socket): the current socket/connection
     """
-    try:
-        msg = sock.recv(BUFFER_SIZE).decode(FORMAT)
-        if msg:
-            print()
-            print(msg)
-    except:
-        global active
-        active = False
+    msg = sock.recv(BUFFER_SIZE).decode(FORMAT)
+    if msg:
+        print()
+        print(msg)
+    else:
+        print('\nDisconnected from server ... exiting!')
+        sel.unregister(sock)
+        sock.close()
+        sys.exit(0)
 
 
 def getStdinInput(stdin, conn):
@@ -87,7 +84,6 @@ def main():
     print('Connecting to server ...')
 
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    
     client.connect(ADDR)
 
     client.setblocking(False)
@@ -100,24 +96,20 @@ def main():
     sel.register(client, selectors.EVENT_READ, read)
     sel.register(sys.stdin, selectors.EVENT_READ, getStdinInput)
 
-    while active:
-
-        sys.stdout.write('> ')
-        sys.stdout.flush()
-
-        for k, _ in sel.select(timeout=None):
-            callback = k.data
-            if callback == getStdinInput:
-                callback(k.fileobj, client)
-            else:
-                callback(k.fileobj)
-
-    sel.unregister(sys.stdin)
-
-    client.close()
-    client.shutdown()
-
-    sel.close()
+    try:
+        while True:
+            sys.stdout.write('> ')
+            sys.stdout.flush()
+            for k, _ in sel.select(timeout=None):
+                callback = k.data
+                if callback == getStdinInput:
+                    callback(k.fileobj, client)
+                else:
+                    callback(k.fileobj)
+    finally:
+        sel.unregister(sys.stdin)
+        client.close()
+        sel.close()
 
 
 if __name__ == '__main__':
