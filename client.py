@@ -14,12 +14,14 @@ BUFFER_SIZE = 2048
 
 active = True
 
+# set input non blocking
 sel = selectors.DefaultSelector()
 origFl = fcntl.fcntl(sys.stdin, fcntl.F_GETFL)
 fcntl.fcntl(sys.stdin, fcntl.F_SETFL, origFl | os.O_NONBLOCK)
 
 
 def signalHandler(sig, frame):
+    """Executed when a user press control + c"""
     global active
     active = False
     print('Interrupt received, shutting down ...')
@@ -27,6 +29,13 @@ def signalHandler(sig, frame):
 
 
 def getArgs():
+    """Gets and parses user's concole input
+
+    Returns:
+        [string]: [the registered name]
+        [string]: [the host name]
+        [string]: [the port]
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument("name", help="Host name of server")
     parser.add_argument("address", help="Port number of server")
@@ -41,8 +50,12 @@ def getArgs():
 
 
 def read(sock):
+    """Retrieves server data and print it to console
+    
+    Args:
+        sock (socket): the current socket/connection
+    """
     try:
-        # retrieve server data and print it to console
         msg = sock.recv(BUFFER_SIZE).decode(FORMAT)
         if msg:
             print(msg)
@@ -52,6 +65,12 @@ def read(sock):
 
 
 def getStdinInput(stdin, conn):
+    """Read user input from stdin, and send it to the server
+
+    Args:
+        stdin (sys.stdin): standard input object
+        conn (the socket): the socket
+    """
     line = stdin.read()
     conn.send(line.rstrip().encode(FORMAT))
 

@@ -20,11 +20,18 @@ clients = dict()
 
 
 def signalHandler(sig, frame):
+    """Executed when a user press control + c"""
     print('Interrupt received, shutting down ...')
     sys.exit(0)
 
 
 def broadcast(clientName, message):
+    """Broadcasts the message to all clients except for the sender
+
+    Args:
+        clientName (string): the registered nickname 
+        message (string): the sent message
+    """
     for name, conn in clients.items():
         formatedMessage = f'@{clientName}: {message}'
         if name != clientName:
@@ -32,13 +39,21 @@ def broadcast(clientName, message):
 
 
 def acceptWrapper(sock):
+    """Sign the user up through:
+    1. retrieve registered user name from 
 
+    Args:
+        sock (socket object): the socket
+    """
+    
     # accept connection
     conn, addr = sock.accept()
 
     print(f'Accepted connection from client address: {addr}')
+    
     conn.setblocking(False)
 
+    # retrieves the username from the client
     msg = conn.recv(BUFFER_SIZE).decode(FORMAT)
     username = msg.lstrip('USERNAME:')
 
@@ -47,7 +62,7 @@ def acceptWrapper(sock):
 
     # add client to the dicitonary
     clients[username] = conn
-    
+
     data = types.SimpleNamespace(
         addr=addr,
         name=username
@@ -59,6 +74,11 @@ def acceptWrapper(sock):
 
 
 def performService(key):
+    """Retrieve and broadcast the message from the client
+
+    Args:
+        key (events): the event key
+    """
 
     conn = key.fileobj
     data = key.data
