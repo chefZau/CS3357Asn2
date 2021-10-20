@@ -15,7 +15,7 @@ BUFFER_SIZE = 2048
 
 sel = selectors.DefaultSelector()
 
-# clients: { clientName: clientConnection }
+# clients: { client Name: client Connection }
 clients = dict()
 
 def broadcast(clientName, message):
@@ -104,25 +104,27 @@ def main():
     server.setblocking(False)
 
     sel.register(server, selectors.EVENT_READ)
+    
+    def signalHandler(sig, frame):
+        """Executed when a user press control + c"""
+        print('Interrupt received, shutting down ...')
+        server.close()
+        sys.exit(0)
+
+    # Register our signal handler for shutting down.
+    signal.signal(signal.SIGINT, signalHandler)
 
     print('Waiting for incoming client connections ...')
 
-    try: 
-        while True:
+    while True:
 
-            events = sel.select(timeout=None)
-            for key, _ in events:
+        events = sel.select(timeout=None)
+        for key, _ in events:
 
-                if key.data is None:
-                    acceptWrapper(key.fileobj)
-                else:
-                    performService(key)
-    except KeyboardInterrupt:
-        print('Interrupt received, shutting down ...')
-    
-    finally:
-        server.close()
-        sys.exit(0)
+            if key.data is None:
+                acceptWrapper(key.fileobj)
+            else:
+                performService(key)
 
 
 if __name__ == '__main__':
