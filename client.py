@@ -7,13 +7,16 @@ from urllib.parse import urlparse
 import sys
 import fcntl
 import os
+import selectors
 
 FORMAT = 'utf-8'
-DISCONNECT_MESSAGE = "!DISCONNECT"
-
 BUFFER_SIZE = 2048
 
 active = True
+
+sel = selectors.DefaultSelector()
+origFl = fcntl.fcntl(sys.stdin, fcntl.F_GETFL)
+fcntl.fcntl(sys.stdin, fcntl.F_SETFL, origFl | os.O_NONBLOCK)
 
 
 def signalHandler(sig, frame):
@@ -21,12 +24,6 @@ def signalHandler(sig, frame):
     active = False
     print('Interrupt received, shutting down ...')
     sys.exit(0)
-
-
-def setInputNonBlocking():
-    # set sys.stdin non-blocking
-    origFl = fcntl.fcntl(sys.stdin, fcntl.F_GETFL)
-    fcntl.fcntl(sys.stdin, fcntl.F_SETFL, origFl | os.O_NONBLOCK)
 
 
 def getArgs():
@@ -43,12 +40,26 @@ def getArgs():
     return name, parsedURL.hostname, parsedURL.port
 
 
+def read(sock):
+    try:
+        # retrieve server data and print it to console
+        msg = sock.recv(BUFFER_SIZE).decode(FORMAT)
+        if msg:
+            print(msg)
+    except:
+        global active
+        active = False
+
+
+def getStdinInput(stdin, conn):
+    line = stdin.read()
+    conn.send(line.rstrip().encode(FORMAT))
+
+
 def main():
 
     # Register our signal handler for shutting down.
     signal.signal(signal.SIGINT, signalHandler)
-
-    # setInputNonBlocking()
 
     NAME, HOST, PORT = getArgs()
     ADDR = (HOST, PORT)
@@ -56,24 +67,36 @@ def main():
     print('Connecting to server ...')
 
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client.setblocking(False)
     client.connect(ADDR)
+
+    client.setblocking(False)
+
     client.sendall(f'USERNAME:{NAME}'.encode(FORMAT))
 
     msg = 'Connection to server established. Sending intro message...\nRegistration successful.  Ready for messageing!\n'
     print(msg)
 
+    sel.register(client, selectors.EVENT_READ, read)
+    sel.register(sys.stdin, selectors.EVENT_READ, getStdinInput)
+
     while active:
 
-        line = input('>')
+        sys.stdout.write('> ')
+        sys.stdout.flush()
 
-        client.send(line.rstrip().encode(FORMAT))
+        for k, _ in sel.select(timeout=None):
+            callback = k.data
+            if callback == getStdinInput:
+                callback(k.fileobj, client)
+            else:
+                callback(k.fileobj)
 
-        msg = client.recv(BUFFER_SIZE).decode(FORMAT)
-        if msg:
-            print(msg)
+    sel.unregister(sys.stdin)
 
     client.close()
+    client.shutdown()
+
+    sel.close()
 
 
 if __name__ == '__main__':
