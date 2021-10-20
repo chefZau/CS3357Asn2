@@ -18,13 +18,6 @@ sel = selectors.DefaultSelector()
 # clients: { clientName: clientConnection }
 clients = dict()
 
-
-def signalHandler(sig, frame):
-    """Executed when a user press control + c"""
-    print('Interrupt received, shutting down ...')
-    sys.exit(0)
-
-
 def broadcast(clientName, message):
     """Broadcasts the message to all clients except for the sender
 
@@ -101,9 +94,6 @@ def performService(key):
 
 def main():
 
-    # Register our signal handler for shutting down.
-    signal.signal(signal.SIGINT, signalHandler)
-
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.bind(ADDR)
 
@@ -117,15 +107,22 @@ def main():
 
     print('Waiting for incoming client connections ...')
 
-    while True:
+    try: 
+        while True:
 
-        events = sel.select(timeout=None)
-        for key, _ in events:
+            events = sel.select(timeout=None)
+            for key, _ in events:
 
-            if key.data is None:
-                acceptWrapper(key.fileobj)
-            else:
-                performService(key)
+                if key.data is None:
+                    acceptWrapper(key.fileobj)
+                else:
+                    performService(key)
+    except KeyboardInterrupt:
+        print('Interrupt received, shutting down ...')
+    
+    finally:
+        server.close()
+        sys.exit(0)
 
 
 if __name__ == '__main__':
