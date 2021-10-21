@@ -51,9 +51,9 @@ def acceptWrapper(sock):
     msg = conn.recv(BUFFER_SIZE).decode(FORMAT)
     username = msg.lstrip('REGISTER ').rstrip(' CHAT/1.0')
 
-    # checks whether the entered nickname is valid 
+    # checks whether the entered nickname is valid
     # checks whether the entered nickname already exists
-    
+
     validRegistration = True
     controlMsg = '200 Registration successful'
     if 'REGISTER ' not in msg or ' CHAT/1.0' not in msg:
@@ -66,7 +66,7 @@ def acceptWrapper(sock):
     conn.sendall(controlMsg.encode(FORMAT))
 
     if validRegistration:
-        
+
         print(
             f'Connection to client estatblished, waiting to reveive messages from user "{username}" ... ')
 
@@ -74,9 +74,9 @@ def acceptWrapper(sock):
         clients[username] = conn
 
         # selectors module allows us store data
-        # the following code creates the data and stores it 
+        # the following code creates the data and stores it
         # using the register method
-        
+
         data = types.SimpleNamespace(
             addr=addr,
             name=username
@@ -100,16 +100,16 @@ def performService(key):
     message = conn.recv(BUFFER_SIZE).decode(FORMAT)
 
     if message and 'DISCONNECT' not in message:
-        
+
         # retrieves the name from the message
         nickname = message.split(':')[0]
         nickname = nickname.lstrip('@')
-        
+
         # everthing after the ': ' is the actual message
         line = message[message.index(': ') + 1:]
-        
+
         print(f'Received message from user {data.name}: {line}')
-        
+
         # broadcast the message to everyone except self
         broadcast(data.name, line)
 
@@ -145,7 +145,7 @@ def main():
         sys.exit(0)
 
     # Register our signal handler for shutting down.
-    
+
     signal.signal(signal.SIGINT, signalHandler)
 
     print('Waiting for incoming client connections ...')
