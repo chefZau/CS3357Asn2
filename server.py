@@ -78,7 +78,6 @@ def acceptWrapper(sock):
         # using the register method
 
         data = types.SimpleNamespace(
-            addr=addr,
             name=username
         )
 
