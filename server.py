@@ -33,7 +33,7 @@ def broadcast(clientName, message):
             conn.sendall(formatedMessage.encode(FORMAT))
 
 
-def acceptWrapper(sock):
+def acceptClient(sock):
     """Sign the user up through:
     1. retrieve registered user name from 
 
@@ -161,7 +161,7 @@ def main():
         for key, _ in events:
 
             if key.data is None:
-                acceptWrapper(key.fileobj)
+                acceptClient(key.fileobj)
             else:
                 performService(key)
 
