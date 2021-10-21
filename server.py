@@ -46,6 +46,8 @@ def acceptWrapper(sock):
 
     conn.setblocking(False)
 
+    print(f'Accepted connection from client address: {addr}')
+    
     # retrieves the username from the client
     msg = conn.recv(BUFFER_SIZE).decode(FORMAT)
     username = msg.lstrip('REGISTER ').rstrip(' CHAT/1.0')
@@ -65,9 +67,7 @@ def acceptWrapper(sock):
     conn.sendall(controlMsg.encode(FORMAT))
 
     if validRegistration:
-        
-        print(f'Accepted connection from client address: {addr}')
-        
+
         print(
             f'Connection to client estatblished, waiting to reveive messages from user "{username}" ... ')
 
