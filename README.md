@@ -8,7 +8,6 @@ Implement in Python a simple client-server chat program. The general purpose of 
 2. Using the socket API in Python.
 3. Writing software supporting a simple protocol.
 
-
 ## Hardware Required
 
 As mentioned by the professor in the email: "Please note that under Windows, at least some versions of Python on some versions of Windows don't like using sys.stdin with selectors. It does work fine under Linux and Mac, however, so you should be able to use the same environment used for Assignment #1 if you run into troubles with this under Windows.", therefore, I recommend using either Mac or Linux to test the program.
@@ -19,7 +18,7 @@ Detailed instructions have been illustrated on OWL. For your convenience, here i
 
 When the server is up, it constantly runs in the background. Users will then run **client.py** to register connections. When users are successfully registered, they can send and receive messages back and forth using the terminal(console).
 
-Notice that the program allows multiple clients to run concurrently. This is done by using the built-in [selectors](https://docs.python.org/3/library/selectors.html) module. 
+Notice that the program allows multiple clients to run concurrently. This is done by using the built-in [selectors](https://docs.python.org/3/library/selectors.html) module.
 
 ## Set it up
 
@@ -85,13 +84,13 @@ When completing this assignment, I noted that there weren't many examples for us
 
 Since the server needs to support communicating with multiple clients simultaneously, I started by learning the basics of the selectors module. Here are some inspirational links I encountered:
 
-* [Python 3 Standard Library: selectors I/O Multiplex Abstraction](https://programming.vip/docs/python-3-standard-library-selectors-i-o-multiplex-abstraction.html)
-* [Python selectors模块用法：实现非阻塞式编程](https://naoketang.com/p/nozql01vqg01)
-* [使用Python实现一个简单的聊天室](https://blog.csdn.net/u011960402/article/details/107503730)
+- [Python 3 Standard Library: selectors I/O Multiplex Abstraction](https://programming.vip/docs/python-3-standard-library-selectors-i-o-multiplex-abstraction.html)
+- [Python selectors 模块用法：实现非阻塞式编程](https://naoketang.com/p/nozql01vqg01)
+- [使用 Python 实现一个简单的聊天室](https://blog.csdn.net/u011960402/article/details/107503730)
 
 The last bit was the user input. One of the requirements was the following:
 
-* To send a message, a user will type it at a prompt provided by their chat client.
+- To send a message, a user will type it at a prompt provided by their chat client.
 
 I tried using the built-in `input()` method. However, the way blocks the incoming message from the server, and the incoming message only displays when I press the enter key on the keyboard. This is not ideal. Fortunately, the professor sent a follow-up email regarding this issue. Here is the email:
 
