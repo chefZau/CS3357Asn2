@@ -100,10 +100,18 @@ def performService(key):
     message = conn.recv(BUFFER_SIZE).decode(FORMAT)
 
     if message:
-        print(f'Received message from user {data.name}: {message}')
+        
+        # retrieves the name from the message
+        nickname = message.split(':')[0]
+        nickname = nickname.lstrip('@')
+        
+        # everthing after the ': ' is the actual message
+        line = message[message.index(': ') + 1:]
+        
+        print(f'Received message from user {data.name}: {line}')
         
         # broadcast the message to everyone except self
-        broadcast(data.name, message)
+        broadcast(data.name, line)
 
     else:
         print(
@@ -132,6 +140,7 @@ def main():
     def signalHandler(sig, frame):
         """Executed when a user press control + c"""
         print('Interrupt received, shutting down ...')
+        server.sendall('DISCONNECT CHAT/1.0')
         server.close()
         sys.exit(0)
 
