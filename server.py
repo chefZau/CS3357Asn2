@@ -15,8 +15,7 @@ BUFFER_SIZE = 2048
 
 sel = selectors.DefaultSelector()
 
-# clients: { client Name: client Connection }
-clients = dict()
+clients = dict()  # clients: { Client Name: Client Connection }
 
 
 def broadcast(clientName, message):
@@ -72,8 +71,7 @@ def acceptWrapper(sock):
         print(
             f'Connection to client estatblished, waiting to reveive messages from user "{username}" ... ')
 
-        # add client to the dicitonary
-        clients[username] = conn
+        clients[username] = conn    # add client to the dicitonary
 
         # selectors module allows us store data
         # the following code creates the data and stores it
@@ -104,10 +102,12 @@ def performService(key):
     if message and 'DISCONNECT' not in message:
 
         # retrieves the name from the message
+
         nickname = message.split(':')[0]
         nickname = nickname.lstrip('@')
 
         # everthing after the ': ' is the actual message
+
         line = message[message.index(': ') + 1:]
 
         print(f'Received message from user {data.name}: {line}')
@@ -139,6 +139,7 @@ def main():
     sel.register(server, selectors.EVENT_READ)
 
     # create a closure for signalHandler
+
     def signalHandler(sig, frame):
         """Executed when a user press control + c"""
         print('Interrupt received, shutting down ...')
