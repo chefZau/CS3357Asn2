@@ -42,7 +42,7 @@ python3 server.py
 When the server starts, it will output a port number in the console. Record this number; we will use it to register a client.
 
 ```text
-Will wait for client messages at port 64700   <---- this one
+Will wait for client messages at port 65102   <---- this one
 Waiting for incoming client connections ...
 ```
 
@@ -57,12 +57,12 @@ python3 client.py <username> chat://<host>:<port>
 1. Replace `<username>` with your prefer username.
 2. Enter an address:
    1. Replace `<host>` with `localhost` or your IP address.
-   2. Replace `<port>` with the recorded port: `64700`.
+   2. Replace `<port>` with the recorded port: `65102`.
 
 Here is an example of the command:
 
 ```python
-python3 client.py luca chat://localhost:64700
+python3 client.py luca chat://localhost:65102
 ```
 
 ### Step 4: Ready to chat
