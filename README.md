@@ -20,7 +20,7 @@ When the server is up, it constantly runs in the background. Users will then run
 
 Notice that the program allows multiple clients to run concurrently. This is done by using the built-in [selectors](https://docs.python.org/3/library/selectors.html) module.
 
-## Set it up
+## Set It Up
 
 ### Step 1: Get Your IP Address
 
