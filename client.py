@@ -127,6 +127,8 @@ def main():
     # Register our signal handler for shutting down.
     def signalHandler(sig, frame):
         """Executed when a user press control + c"""
+        formattedMsg = f'DISCONNECT {username} CHAT/1.0'
+        client.sendall(formattedMsg.encode(FORMAT))
         print('Interrupt received, shutting down ...')
         sys.exit(0)
 

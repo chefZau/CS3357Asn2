@@ -140,7 +140,7 @@ def main():
     def signalHandler(sig, frame):
         """Executed when a user press control + c"""
         print('Interrupt received, shutting down ...')
-        server.sendall('DISCONNECT CHAT/1.0')
+        server.sendall('DISCONNECT CHAT/1.0'.encode(FORMAT))
         server.close()
         sys.exit(0)
 
