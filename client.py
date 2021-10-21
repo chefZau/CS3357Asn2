@@ -22,11 +22,8 @@ fcntl.fcntl(sys.stdin, fcntl.F_SETFL, origFl | os.O_NONBLOCK)
 # the variable checks whether the client is signed in or not
 signIn = False
 
-
-def signalHandler(sig, frame):
-    """Executed when a user press control + c"""
-    print('Interrupt received, shutting down ...')
-    sys.exit(0)
+# sotres their username globally
+username = None
 
 
 def getArgs():
@@ -57,7 +54,8 @@ def read(sock):
         sock (socket): the current socket/connection
     """
     msg = sock.recv(BUFFER_SIZE).decode(FORMAT)
-    if msg:
+    
+    if msg and msg != 'DISCONNECT CHAT/1.0':
 
         # When a client opens the app for the first time, the app will send
         # their entered nickname to the server. The server has three return options:
@@ -108,23 +106,31 @@ def getStdinInput(stdin, conn):
         conn (the socket): the socket
     """
     line = stdin.read()
-    conn.send(line.rstrip().encode(FORMAT))
+    formattedMsg = f'@{username}: {line}'
+    conn.send(formattedMsg.rstrip().encode(FORMAT))
 
 
 def main():
-
-    # Register our signal handler for shutting down.
-
-    signal.signal(signal.SIGINT, signalHandler)
 
     # retrieves the arguments from the console
 
     NAME, HOST, PORT = getArgs()
     ADDR = (HOST, PORT)
+    
+    global username
+    username = NAME
 
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client.connect(ADDR)
     client.setblocking(False)
+
+    # Register our signal handler for shutting down.
+    def signalHandler(sig, frame):
+        """Executed when a user press control + c"""
+        print('Interrupt received, shutting down ...')
+        sys.exit(0)
+
+    signal.signal(signal.SIGINT, signalHandler)
 
     registrationMsg = f'REGISTER {NAME} CHAT/1.0'
     client.sendall(registrationMsg.encode(FORMAT))
