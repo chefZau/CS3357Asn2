@@ -28,7 +28,9 @@ def broadcast(clientName, message):
     """
     for name, conn in clients.items():
         formatedMessage = f'@{clientName}: {message}'
-        if name != clientName:
+        if clientName == '':
+            conn.sendall(message.encode(FORMAT))
+        elif name != clientName:
             conn.sendall(formatedMessage.encode(FORMAT))
 
 
@@ -140,7 +142,10 @@ def main():
     def signalHandler(sig, frame):
         """Executed when a user press control + c"""
         print('Interrupt received, shutting down ...')
-        server.sendall('DISCONNECT CHAT/1.0'.encode(FORMAT))
+
+        disconnectMsg = 'DISCONNECT CHAT/1.0'
+        broadcast('', disconnectMsg)
+
         server.close()
         sys.exit(0)
 
