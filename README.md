@@ -14,7 +14,7 @@ As mentioned by the professor in the email: "Please note that under Windows, at 
 
 ## How It Works
 
-Detailed instructions have been illustrated on OWL. For your convenience, here is a quick explanation. There are two files in this assignment: **client.py** and **server.py**. As their name suggests, **server.py** is for starting the server and handling incoming requests, whereas **client.py** is responsible for taking client input at the console and communicating with the server.
+Detailed instructions have been illustrated on OWL. I also added a [screenshot](./Self-reported%20Absence%20Acceptance.png) in the folder. For your convenience, here is a quick explanation. There are two files in this assignment: **client.py** and **server.py**. As their name suggests, **server.py** is for starting the server and handling incoming requests, whereas **client.py** is responsible for taking client input at the console and communicating with the server.
 
 When the server is up, it constantly runs in the background. Users will then run **client.py** to register connections. When users are successfully registered, they can send and receive messages back and forth using the terminal(console).
 
