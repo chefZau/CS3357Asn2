@@ -54,8 +54,8 @@ def read(sock):
         sock (socket): the current socket/connection
     """
     msg = sock.recv(BUFFER_SIZE).decode(FORMAT)
-    
-    if msg and msg != 'DISCONNECT CHAT/1.0':
+
+    if msg:
 
         # When a client opens the app for the first time, the app will send
         # their entered nickname to the server. The server has three return options:
@@ -81,7 +81,7 @@ def read(sock):
             # asks client for console input
             sel.register(sys.stdin, selectors.EVENT_READ, getStdinInput)
 
-        elif msg in ['401 Client already registered', '400 Invalid registration']:
+        elif msg in ['401 Client already registered', '400 Invalid registration', 'DISCONNECT CHAT/1.0']:
             print(f'\n{msg} ... Please try again later ')
             sel.unregister(sock)
             sock.close()
@@ -116,7 +116,7 @@ def main():
 
     NAME, HOST, PORT = getArgs()
     ADDR = (HOST, PORT)
-    
+
     global username
     username = NAME
 
