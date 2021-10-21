@@ -99,7 +99,7 @@ def performService(key):
 
     message = conn.recv(BUFFER_SIZE).decode(FORMAT)
 
-    if message:
+    if message and 'DISCONNECT' not in message:
         
         # retrieves the name from the message
         nickname = message.split(':')[0]
